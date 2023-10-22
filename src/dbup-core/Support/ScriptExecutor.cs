@@ -170,15 +170,11 @@ namespace DbUp.Support
             }
             catch (DbException sqlException)
             {
-                Log().LogInformation("DB exception has occurred in script: '{0}'", script.Name);
-                Log().LogError("Script block number: {0}; Message: {1}", index, sqlException.Message);
-                Log().LogError("{0}", sqlException.ToString());
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Log().LogInformation("Exception has occurred in script: '{0}'", script.Name);
-                Log().LogError("{0}", ex.ToString());
+                Log().LogError(
+                    "Script block number: {0}; Error Code: {1}; Message: {2}",
+                    index,
+                    sqlException.ErrorCode > 0 ? sqlException.ErrorCode : "(NONE)",
+                    sqlException.Message);
                 throw;
             }
         }

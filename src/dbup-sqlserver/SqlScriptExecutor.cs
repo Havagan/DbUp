@@ -45,9 +45,13 @@ namespace DbUp.SqlServer
             }
             catch (SqlException sqlException)
             {
-                Log().LogInformation("SQL exception has occurred in script: '{0}'", script.Name);
-                Log().LogError("Script block number: {0}; Block line {1}; Procedure {2}; Number {3}; Message: {4}", index, sqlException.LineNumber, sqlException.Procedure, sqlException.Number, sqlException.Message);
-                Log().LogError(sqlException.ToString());
+                Log().LogError(
+                    "Script block number: {0}; Block line {1}; Procedure {2}; Error Number {3}; Message: {4}",
+                    index,
+                    sqlException.LineNumber,
+                    string.IsNullOrWhiteSpace(sqlException.Procedure) ? "(NONE)" : sqlException.Procedure,
+                    sqlException.Number,
+                    sqlException.Message);
                 throw;
             }
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using DbUp.Engine;
@@ -7,8 +8,8 @@ namespace DbUp.Tests.Common.RecordingDb;
 
 public class RecordingDbConnection : IDbConnection
 {
-    readonly Dictionary<string?, Func<object>> scalarResults = new();
-    readonly Dictionary<string?, Func<int>> nonQueryResults = new();
+    readonly ConcurrentDictionary<string?, Func<object>> scalarResults = new();
+    readonly ConcurrentDictionary<string?, Func<int>> nonQueryResults = new();
     readonly CaptureLogsLogger logger;
 
     public RecordingDbConnection(CaptureLogsLogger logger)
@@ -67,11 +68,11 @@ public class RecordingDbConnection : IDbConnection
 
     public void SetupScalarResult(string? sql, Func<object> action)
     {
-        scalarResults.Add(sql, action);
+        scalarResults.TryAdd(sql, action);
     }
 
     public void SetupNonQueryResult(string? sql, Func<int> result)
     {
-        nonQueryResults.Add(sql, result);
+        nonQueryResults.TryAdd(sql, result);
     }
 }

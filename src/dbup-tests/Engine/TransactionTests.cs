@@ -19,10 +19,8 @@ public class TransactionTests
     {
         var connectionFactory = new TransactionCountingConnectionFactory();
 
-        var testProvider = new TestProvider();
-        testProvider.Builder.Configure(c => c.ConnectionManager = new TestConnectionManager(connectionFactory));
-
-        var upgradeEngine = testProvider.Builder
+        var upgradeEngine = new TestProvider(new TestConnectionManager(connectionFactory))
+            .Builder
             .WithScript("testscript1", "SELECT 1")
             .WithScript("testscript2", "SELECT 1")
             .WithTransactionPerScript()

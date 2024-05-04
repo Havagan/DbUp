@@ -20,10 +20,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{7BA5C1AE
 	ProjectSection(SolutionItems) = preProject
 		..\build.cake = ..\build.cake
 		..\build.ps1 = ..\build.ps1
-		..\.github\workflows\publish-release.yml = ..\.github\workflows\publish-release.yml
 		..\.github\workflows\create-draft-release.yml = ..\.github\workflows\create-draft-release.yml
-		..\.github\workflows\test-report.yml = ..\.github\workflows\test-report.yml
 		..\.github\workflows\main.yml = ..\.github\workflows\main.yml
+		..\.github\workflows\publish-release.yml = ..\.github\workflows\publish-release.yml
+		..\.github\workflows\test-report.yml = ..\.github\workflows\test-report.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Common", "Tests.Common\Tests.Common.csproj", "{B25DA0B8-6A43-499F-84BE-91132AC433B5}"
@@ -49,8 +49,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6807402B-EE7A-4324-A615-28F3499B1E9F}

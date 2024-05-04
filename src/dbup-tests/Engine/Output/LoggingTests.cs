@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DbUp.Tests.TestInfrastructure;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
@@ -19,14 +20,14 @@ namespace DbUp.Tests.Engine.Output
                     .CreateLogger()
                 );
 
-            var engine = DeployChanges.To
-                .SQLiteDatabase("Data Source=:memory:")
+            var engine = new TestProvider().Builder
                 .WithScript(new SqlScript("1234", "SELECT 1"))
                 .JournalTo(new NullJournal())
                 .LogTo(factory)
                 .Build();
 
             var result = engine.PerformUpgrade();
+
             result.Successful.ShouldBe(true);
             capturedLogs.Events.ShouldContain(e => e.MessageTemplate.Text == "Executing Database Server script '{0}'");
         }
@@ -44,8 +45,7 @@ namespace DbUp.Tests.Engine.Output
 
             var logger = factory.CreateLogger<LoggingTests>();
 
-            var engine = DeployChanges.To
-                .SQLiteDatabase("Data Source=:memory:")
+            var engine = new TestProvider().Builder
                 .WithScript(new SqlScript("1234", "SELECT 1"))
                 .JournalTo(new NullJournal())
                 .LogTo(logger)
@@ -57,9 +57,10 @@ namespace DbUp.Tests.Engine.Output
             capturedLogs.Events.ShouldContain(e => e.MessageTemplate.Text == "Executing Database Server script '{0}'");
         }
 
-    class InMemorySink : ILogEventSink
-    {
-        public List<LogEvent> Events { get; } = new();
-        public void Emit(LogEvent logEvent) => Events.Add(logEvent);
+        class InMemorySink : ILogEventSink
+        {
+            public List<LogEvent> Events { get; } = new();
+            public void Emit(LogEvent logEvent) => Events.Add(logEvent);
+        }
     }
 }

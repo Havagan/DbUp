@@ -8,11 +8,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Tests.Common\Tests.Common.csproj" />
     <ProjectReference Include="..\dbup-core\dbup-core.csproj" />
-    <ProjectReference Include="..\dbup-oracle\dbup-oracle.csproj" />
-    <ProjectReference Include="..\dbup-sqlserver\dbup-sqlserver.csproj" />
-    <ProjectReference Include="..\dbup-sqlite\dbup-sqlite.csproj" />
-    <ProjectReference Include="..\dbup-mysql\dbup-mysql.csproj" />
-    <ProjectReference Include="..\dbup-postgresql\dbup-postgresql.csproj" />
+    <PackageReference Include="dbup-firebird" Version="5.0.39" />
+    <PackageReference Include="dbup-mysql" Version="5.0.44" />
+    <PackageReference Include="dbup-oracle" Version="5.0.40" />
+    <PackageReference Include="dbup-sqlite" Version="5.0.40" />
+    <PackageReference Include="dbup-sqlserver" Version="5.0.40" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
@@ -23,22 +23,22 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Serilog" Version="3.0.1"/>
-    <PackageReference Include="Shouldly" Version="4.2.1"/>
-    <PackageReference Include="NSubstitute" Version="5.1.0"/>
+    <PackageReference Include="Serilog" Version="3.0.1" />
+    <PackageReference Include="Shouldly" Version="4.2.1" />
+    <PackageReference Include="NSubstitute" Version="5.1.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
-    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0"/>
-    <Reference Include="System"/>
-    <Reference Include="Microsoft.CSharp"/>
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="**\*.received.cs"/>
-    <EmbeddedResource Include="TestScripts\**\*.sql" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)"/>
-    <Compile Remove="**\ApprovalFiles\*.cs"/>
-    <None Include="**\ApprovalFiles\*.cs"/>
+    <Compile Remove="**\*.received.cs" />
+    <EmbeddedResource Include="TestScripts\**\*.sql" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+    <Compile Remove="**\ApprovalFiles\*.cs" />
+    <None Include="**\ApprovalFiles\*.cs" />
     <None Update="TestFilterFiles\ScriptNames.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

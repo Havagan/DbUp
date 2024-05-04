@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using DbUp.Engine;
 
@@ -10,7 +11,7 @@ namespace DbUp.Builder;
 /// </summary>
 public class UpgradeEngineBuilder
 {
-    protected readonly List<Action<UpgradeConfiguration>> callbacks = new();
+    protected readonly ConcurrentQueue<Action<UpgradeConfiguration>> callbacks = new();
 
     /// <summary>
     /// Adds a callback that will be run to configure the upgrader when Build is called.
@@ -18,20 +19,26 @@ public class UpgradeEngineBuilder
     /// <param name="configuration">The configuration.</param>
     public virtual void Configure(Action<UpgradeConfiguration> configuration)
     {
-        callbacks.Add(configuration);
+        callbacks.Enqueue(configuration);
     }
 
     /// <summary>
     /// Creates an UpgradeConfiguration based on this configuration.
     /// </summary>
     /// <returns></returns>
-    public virtual UpgradeConfiguration BuildConfiguration()
+    protected virtual UpgradeConfiguration BuildConfiguration()
     {
         var config = new UpgradeConfiguration();
-        foreach (var callback in callbacks)
+
+        while (callbacks.TryDequeue(out var callback) && callback is not null)
         {
             callback(config);
         }
+
+        //foreach (var callback in callbacks)
+        //{
+        //    callback(config);
+        //}
 
         config.Validate();
 

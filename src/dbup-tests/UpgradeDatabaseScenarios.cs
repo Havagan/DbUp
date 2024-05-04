@@ -27,7 +27,7 @@ public class UpgradeDatabaseScenarios
         scripts = new List<SqlScript> {new("Script1.sql", "create table Foo (Id int identity)"), new("Script2.sql", "alter table Foo add column Name varchar(255)"), new("Script3.sql", "insert into Foo (Name) values ('test')")};
 
         testProvider = new TestProvider();
-        testProvider.Builder.WithScripts(new TestScriptProvider(scripts));
+        testProvider.Builder.WithScriptProvider(new TestScriptProvider(scripts));
     }
 
         [Fact]

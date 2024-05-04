@@ -23,7 +23,7 @@ public static class StandardExtensions
     public static DbUp.Builder.UpgradeEngineBuilder WithScript(this DbUp.Builder.UpgradeEngineBuilder builder, string name, string contents, DbUp.Engine.SqlScriptOptions sqlScriptOptions) { }
     public static DbUp.Builder.UpgradeEngineBuilder WithScript(this DbUp.Builder.UpgradeEngineBuilder builder, string name, DbUp.Engine.IScript script, DbUp.Engine.SqlScriptOptions sqlScriptOptions) { }
     public static DbUp.Builder.UpgradeEngineBuilder WithScriptNameComparer(this DbUp.Builder.UpgradeEngineBuilder builder, System.Collections.Generic.IComparer<string> comparer) { }
-    public static DbUp.Builder.UpgradeEngineBuilder WithScripts(this DbUp.Builder.UpgradeEngineBuilder builder, DbUp.Engine.IScriptProvider scriptProvider) { }
+    public static DbUp.Builder.UpgradeEngineBuilder WithScriptProvider(this DbUp.Builder.UpgradeEngineBuilder builder, DbUp.Engine.IScriptProvider scriptProvider) { }
     public static DbUp.Builder.UpgradeEngineBuilder WithScripts(this DbUp.Builder.UpgradeEngineBuilder builder, System.Collections.Generic.IEnumerable<DbUp.Engine.SqlScript> scripts) { }
     public static DbUp.Builder.UpgradeEngineBuilder WithScripts(this DbUp.Builder.UpgradeEngineBuilder builder, params DbUp.Engine.SqlScript[] scripts) { }
     public static DbUp.Builder.UpgradeEngineBuilder WithScripts(this DbUp.Builder.UpgradeEngineBuilder builder, params DbUp.Engine.IScript[] scripts) { }
@@ -131,10 +131,10 @@ namespace DbUp.Builder
     }
     public class UpgradeEngineBuilder
     {
-        protected readonly System.Collections.Generic.List<System.Action<DbUp.Builder.UpgradeConfiguration>> callbacks;
+        protected readonly System.Collections.Concurrent.ConcurrentQueue<System.Action<DbUp.Builder.UpgradeConfiguration>> callbacks;
         public UpgradeEngineBuilder() { }
         public virtual DbUp.Engine.UpgradeEngine Build() { }
-        public virtual DbUp.Builder.UpgradeConfiguration BuildConfiguration() { }
+        protected virtual DbUp.Builder.UpgradeConfiguration BuildConfiguration() { }
         public virtual void Configure(System.Action<DbUp.Builder.UpgradeConfiguration> configuration) { }
     }
 }

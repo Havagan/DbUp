@@ -17,15 +17,15 @@ namespace DbUp.Tests.Common.RecordingDb
             backingList = new ConcurrentBag<object>();
         }
 
-    public IEnumerator GetEnumerator()
-    {
-        throw new NotImplementedException();
-    }
+        public IEnumerator GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
 
-    public void CopyTo(Array array, int index)
-    {
-        throw new NotImplementedException();
-    }
+        public void CopyTo(Array array, int index)
+        {
+            throw new NotImplementedException();
+        }
 
         public int Count { get; private set; }
         public object? SyncRoot { get; private set; }
@@ -37,63 +37,64 @@ namespace DbUp.Tests.Common.RecordingDb
             return backingList.Count - 1;
         }
 
-    public bool Contains(object value)
-    {
-        throw new NotImplementedException();
-    }
+        public bool Contains(object value)
+        {
+            throw new NotImplementedException();
+        }
 
-    public void Clear()
-    {
-        throw new NotImplementedException();
-    }
+        public void Clear()
+        {
+            throw new NotImplementedException();
+        }
 
-    public int IndexOf(object value)
-    {
-        throw new NotImplementedException();
-    }
+        public int IndexOf(object value)
+        {
+            throw new NotImplementedException();
+        }
 
-    public void Insert(int index, object value)
-    {
-        throw new NotImplementedException();
-    }
+        public void Insert(int index, object value)
+        {
+            throw new NotImplementedException();
+        }
 
-    public void Remove(object value)
-    {
-        throw new NotImplementedException();
-    }
+        public void Remove(object value)
+        {
+            throw new NotImplementedException();
+        }
 
-    public void RemoveAt(int index)
-    {
-        throw new NotImplementedException();
-    }
+        public void RemoveAt(int index)
+        {
+            throw new NotImplementedException();
+        }
 
-    object IList.this[int index]
-    {
-        get => throw new NotImplementedException();
-        set => throw new NotImplementedException();
-    }
+        object IList.this[int index]
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
 
-    public bool IsReadOnly { get; private set; }
-    public bool IsFixedSize { get; private set; }
+        public bool IsReadOnly { get; private set; }
+        public bool IsFixedSize { get; private set; }
 
-    public bool Contains(string parameterName)
-    {
-        throw new NotImplementedException();
-    }
+        public bool Contains(string parameterName)
+        {
+            throw new NotImplementedException();
+        }
 
-    public int IndexOf(string parameterName)
-    {
-        throw new NotImplementedException();
-    }
+        public int IndexOf(string parameterName)
+        {
+            throw new NotImplementedException();
+        }
 
-    public void RemoveAt(string parameterName)
-    {
-        throw new NotImplementedException();
-    }
+        public void RemoveAt(string parameterName)
+        {
+            throw new NotImplementedException();
+        }
 
-    object IDataParameterCollection.this[string parameterName]
-    {
-        get => throw new NotImplementedException();
-        set => throw new NotImplementedException();
+        object IDataParameterCollection.this[string parameterName]
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
     }
 }

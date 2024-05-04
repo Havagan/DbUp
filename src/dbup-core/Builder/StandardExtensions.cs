@@ -149,7 +149,7 @@ public static class StandardExtensions
     /// <returns>
     /// The same builder
     /// </returns>
-    public static UpgradeEngineBuilder WithScripts(this UpgradeEngineBuilder builder, IScriptProvider scriptProvider)
+    public static UpgradeEngineBuilder WithScriptProvider(this UpgradeEngineBuilder builder, IScriptProvider scriptProvider)
     {
         builder.Configure(c => c.ScriptProviders.Add(scriptProvider));
         return builder;
@@ -165,7 +165,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScripts(this UpgradeEngineBuilder builder, IEnumerable<SqlScript> scripts)
     {
-        return WithScripts(builder, new StaticScriptProvider(scripts));
+        return WithScriptProvider(builder, new StaticScriptProvider(scripts));
     }
 
     /// <summary>
@@ -235,7 +235,7 @@ public static class StandardExtensions
     /// The same builder
     /// </returns>
     public static UpgradeEngineBuilder WithScript(this UpgradeEngineBuilder builder, string name, IScript script)
-        => WithScripts(builder, new ScriptInstanceProvider(_ => name, script));
+        => WithScriptProvider(builder, new ScriptInstanceProvider(_ => name, script));
 
     /// <summary>
     /// Adds a single IScript instance to the upgrader.
@@ -248,7 +248,7 @@ public static class StandardExtensions
     /// The same builder
     /// </returns>
     public static UpgradeEngineBuilder WithScript(this UpgradeEngineBuilder builder, string name, IScript script, SqlScriptOptions sqlScriptOptions)
-        => WithScripts(builder, new ScriptInstanceProvider(_ => name, sqlScriptOptions, script));
+        => WithScriptProvider(builder, new ScriptInstanceProvider(_ => name, sqlScriptOptions, script));
 
     /// <summary>
     /// Adds IScript instances to the upgrader.
@@ -259,7 +259,7 @@ public static class StandardExtensions
     /// The same builder
     /// </returns>
     public static UpgradeEngineBuilder WithScripts(this UpgradeEngineBuilder builder, params IScript[] scripts)
-        => WithScripts(builder, new ScriptInstanceProvider(scripts));
+        => WithScriptProvider(builder, new ScriptInstanceProvider(scripts));
 
     /// <summary>
     /// Adds IScript instances to the upgrader.
@@ -271,7 +271,7 @@ public static class StandardExtensions
     /// The same builder
     /// </returns>
     public static UpgradeEngineBuilder WithScripts(this UpgradeEngineBuilder builder, Func<IScript, string> namer, params IScript[] scripts)
-        => WithScripts(builder, new ScriptInstanceProvider(namer, scripts));
+        => WithScriptProvider(builder, new ScriptInstanceProvider(namer, scripts));
 
     /// <summary>
     /// Adds IScript instances to the upgrader.
@@ -284,7 +284,7 @@ public static class StandardExtensions
     /// The same builder
     /// </returns>
     public static UpgradeEngineBuilder WithScripts(this UpgradeEngineBuilder builder, Func<IScript, string> namer, SqlScriptOptions sqlScriptOptions, params IScript[] scripts)
-        => WithScripts(builder, new ScriptInstanceProvider(namer, sqlScriptOptions, scripts));
+        => WithScriptProvider(builder, new ScriptInstanceProvider(namer, sqlScriptOptions, scripts));
 
     /// <summary>
     /// Adds all scripts from a folder on the file system.
@@ -296,7 +296,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path));
+        return WithScriptProvider(builder, new FileSystemScriptProvider(path));
     }
 
     /// <summary>
@@ -310,7 +310,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions(), sqlScriptOptions));
+        return WithScriptProvider(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions(), sqlScriptOptions));
     }
 
     /// <summary>
@@ -324,7 +324,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, Func<string, bool> filter)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Filter = filter}));
+        return WithScriptProvider(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Filter = filter}));
     }
 
     /// <summary>
@@ -339,7 +339,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, Func<string, bool> filter, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Filter = filter}, sqlScriptOptions));
+        return WithScriptProvider(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Filter = filter}, sqlScriptOptions));
     }
 
     /// <summary>
@@ -353,7 +353,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, Encoding encoding)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Encoding = encoding}));
+        return WithScriptProvider(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Encoding = encoding}));
     }
 
     /// <summary>
@@ -368,7 +368,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, Encoding encoding, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Encoding = encoding}, sqlScriptOptions));
+        return WithScriptProvider(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Encoding = encoding}, sqlScriptOptions));
     }
 
     /// <summary>
@@ -383,7 +383,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, Func<string, bool> filter, Encoding encoding)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Filter = filter, Encoding = encoding}));
+        return WithScriptProvider(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Filter = filter, Encoding = encoding}));
     }
 
     /// <summary>
@@ -399,7 +399,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, Func<string, bool> filter, Encoding encoding, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Filter = filter, Encoding = encoding}, sqlScriptOptions));
+        return WithScriptProvider(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Filter = filter, Encoding = encoding}, sqlScriptOptions));
     }
 
     /// <summary>
@@ -413,7 +413,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, FileSystemScriptOptions options)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, options));
+        return WithScriptProvider(builder, new FileSystemScriptProvider(path, options));
     }
 
     /// <summary>
@@ -428,7 +428,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, FileSystemScriptOptions options, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, options, sqlScriptOptions));
+        return WithScriptProvider(builder, new FileSystemScriptProvider(path, options, sqlScriptOptions));
     }
 
     /// <summary>
@@ -441,7 +441,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly)
     {
-        return WithScripts(builder, new EmbeddedScriptProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase)));
+        return WithScriptProvider(builder, new EmbeddedScriptProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase)));
     }
 
     /// <summary>
@@ -455,7 +455,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new EmbeddedScriptProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase), DbUpDefaults.DefaultEncoding, sqlScriptOptions));
+        return WithScriptProvider(builder, new EmbeddedScriptProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase), DbUpDefaults.DefaultEncoding, sqlScriptOptions));
     }
 
     /// <summary>
@@ -469,7 +469,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly, Encoding encoding)
     {
-        return WithScripts(builder, new EmbeddedScriptProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase), encoding));
+        return WithScriptProvider(builder, new EmbeddedScriptProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase), encoding));
     }
 
     /// <summary>
@@ -484,7 +484,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly, Encoding encoding, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new EmbeddedScriptProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase), encoding, sqlScriptOptions));
+        return WithScriptProvider(builder, new EmbeddedScriptProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase), encoding, sqlScriptOptions));
     }
 
     /// <summary>
@@ -499,7 +499,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly, Func<string, bool> filter, Encoding encoding)
     {
-        return WithScripts(builder, new EmbeddedScriptProvider(assembly, filter, encoding));
+        return WithScriptProvider(builder, new EmbeddedScriptProvider(assembly, filter, encoding));
     }
 
     /// <summary>
@@ -515,7 +515,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly, Func<string, bool> filter, Encoding encoding, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new EmbeddedScriptProvider(assembly, filter, encoding, sqlScriptOptions));
+        return WithScriptProvider(builder, new EmbeddedScriptProvider(assembly, filter, encoding, sqlScriptOptions));
     }
 
     /// <summary>
@@ -529,7 +529,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly, Func<string, bool> filter)
     {
-        return WithScripts(builder, new EmbeddedScriptProvider(assembly, filter));
+        return WithScriptProvider(builder, new EmbeddedScriptProvider(assembly, filter));
     }
 
     /// <summary>
@@ -544,7 +544,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly, Func<string, bool> filter, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new EmbeddedScriptProvider(assembly, filter, DbUpDefaults.DefaultEncoding, sqlScriptOptions));
+        return WithScriptProvider(builder, new EmbeddedScriptProvider(assembly, filter, DbUpDefaults.DefaultEncoding, sqlScriptOptions));
     }
 
     /// <summary>
@@ -557,7 +557,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsAndCodeEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly)
     {
-        return WithScripts(builder, new EmbeddedScriptAndCodeProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase), _ => true));
+        return WithScriptProvider(builder, new EmbeddedScriptAndCodeProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase), _ => true));
     }
 
     /// <summary>
@@ -571,7 +571,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsAndCodeEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new EmbeddedScriptAndCodeProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase), sqlScriptOptions));
+        return WithScriptProvider(builder, new EmbeddedScriptAndCodeProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase), sqlScriptOptions));
     }
 
     /// <summary>
@@ -585,7 +585,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsAndCodeEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly, Func<string, bool> filter)
     {
-        return WithScripts(builder, new EmbeddedScriptAndCodeProvider(assembly, filter));
+        return WithScriptProvider(builder, new EmbeddedScriptAndCodeProvider(assembly, filter));
     }
 
     /// <summary>
@@ -600,7 +600,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsAndCodeEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly, Func<string, bool> filter, Func<string, bool> codeScriptFilter)
     {
-        return WithScripts(builder, new EmbeddedScriptAndCodeProvider(assembly, filter, codeScriptFilter));
+        return WithScriptProvider(builder, new EmbeddedScriptAndCodeProvider(assembly, filter, codeScriptFilter));
     }
 
     /// <summary>
@@ -616,7 +616,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsAndCodeEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly, Func<string, bool> filter, Func<string, bool> codeScriptFilter, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new EmbeddedScriptAndCodeProvider(assembly, filter, codeScriptFilter, sqlScriptOptions));
+        return WithScriptProvider(builder, new EmbeddedScriptAndCodeProvider(assembly, filter, codeScriptFilter, sqlScriptOptions));
     }
 
     /// <summary>
@@ -631,7 +631,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsAndCodeEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly, Func<string, bool> filter, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new EmbeddedScriptAndCodeProvider(assembly, filter, sqlScriptOptions));
+        return WithScriptProvider(builder, new EmbeddedScriptAndCodeProvider(assembly, filter, sqlScriptOptions));
     }
 
     /// <summary>
@@ -839,7 +839,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsEmbeddedInAssemblies(this UpgradeEngineBuilder builder, Assembly[] assemblies, Func<string, bool> filter, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new EmbeddedScriptsProvider(assemblies, filter, DbUpDefaults.DefaultEncoding, sqlScriptOptions));
+        return WithScriptProvider(builder, new EmbeddedScriptsProvider(assemblies, filter, DbUpDefaults.DefaultEncoding, sqlScriptOptions));
     }
 
     /// <summary>
@@ -868,7 +868,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsEmbeddedInAssemblies(this UpgradeEngineBuilder builder, Assembly[] assemblies, Func<string, bool> filter, Encoding encoding)
     {
-        return WithScripts(builder, new EmbeddedScriptsProvider(assemblies, filter, encoding));
+        return WithScriptProvider(builder, new EmbeddedScriptsProvider(assemblies, filter, encoding));
     }
 
     /// <summary>
@@ -884,6 +884,6 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsEmbeddedInAssemblies(this UpgradeEngineBuilder builder, Assembly[] assemblies, Func<string, bool> filter, Encoding encoding, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new EmbeddedScriptsProvider(assemblies, filter, encoding, sqlScriptOptions));
+        return WithScriptProvider(builder, new EmbeddedScriptsProvider(assemblies, filter, encoding, sqlScriptOptions));
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace DbUp.Tests.TestInfrastructure;
 public class InMemoryJournal : IJournal
 {
     readonly IUpgradeLog log;
-    readonly List<string> executedScripts = new();
+    readonly ConcurrentBag<string> executedScripts = new();
 
     public InMemoryJournal(IUpgradeLog log)
     {
@@ -23,9 +24,14 @@ public class InMemoryJournal : IJournal
 
     public void EnsureTableExistsAndIsLatestVersion(Func<IDbCommand> dbCommandFactory)
     {
-        log.WriteInformation("Ensuring tables exists and is latest version");
+        log.LogInformation("Ensuring the journal table exists and is latest version");
     }
 
     public void AddScriptsAsPreviouslyExecuted(IReadOnlyList<SqlScript> scripts)
-        => executedScripts.AddRange(scripts.Select(s => s.Name));
+    {
+        foreach (var script in scripts)
+        {
+            executedScripts.Add(script.Name);
+        }
+    }
 }

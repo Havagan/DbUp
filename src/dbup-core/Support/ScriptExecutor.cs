@@ -38,8 +38,11 @@ public abstract class ScriptExecutor : IScriptExecutor
     /// <param name="scriptPreprocessors">Script Preprocessors in addition to variable substitution</param>
     /// <param name="journalFactory">Database journal</param>
     public ScriptExecutor(
-        Func<IConnectionManager> connectionManagerFactory, ISqlObjectParser sqlObjectParser,
-        Func<IUpgradeLog> log, string schema, Func<bool> variablesEnabled,
+        Func<IConnectionManager> connectionManagerFactory,
+        ISqlObjectParser sqlObjectParser,
+        Func<IUpgradeLog> log,
+        string schema,
+        Func<bool> variablesEnabled,
         IEnumerable<IScriptPreprocessor> scriptPreprocessors,
         Func<IJournal> journalFactory)
     {
@@ -107,15 +110,15 @@ public abstract class ScriptExecutor : IScriptExecutor
         return contents;
     }
 
-        /// <summary>
-        /// Executes the specified script against a database at a given connection string.
-        /// </summary>
-        /// <param name="script">The script.</param>
-        /// <param name="variables">Variables to replace in the script</param>
-        public virtual void Execute(SqlScript script, IDictionary<string, string> variables)
-        {
-            var contents = PreprocessScriptContents(script, variables);
-            Log().LogInformation("Executing Database Server script '{0}'", script.Name);
+    /// <summary>
+    /// Executes the specified script against a database at a given connection string.
+    /// </summary>
+    /// <param name="script">The script.</param>
+    /// <param name="variables">Variables to replace in the script</param>
+    public virtual void Execute(SqlScript script, IDictionary<string, string> variables)
+    {
+        var contents = PreprocessScriptContents(script, variables);
+        Log().LogInformation("Executing Database Server script '{0}'", script.Name);
 
         var connectionManager = connectionManagerFactory();
         var scriptStatements = connectionManager.SplitScriptIntoCommands(contents);
@@ -155,30 +158,37 @@ public abstract class ScriptExecutor : IScriptExecutor
                     }
                 }
 
-                    if (UseTheSameTransactionForJournalTableAndScripts)
-                    {
-                        journal.StoreExecutedScript(script, dbCommandFactory);
-                    }
-                });
-                if (!UseTheSameTransactionForJournalTableAndScripts)
+                if (UseTheSameTransactionForJournalTableAndScripts)
                 {
-                    connectionManager.ExecuteCommandsWithManagedConnection(dbCommandFactory =>
-                    {
-                        var journal = journalFactory();
-                        journal.StoreExecutedScript(script, dbCommandFactory);
-                    });
+                    journal.StoreExecutedScript(script, dbCommandFactory);
                 }
-            }
-            catch (DbException sqlException)
+            });
+            if (!UseTheSameTransactionForJournalTableAndScripts)
             {
-                Log().LogError(
+                connectionManager.ExecuteCommandsWithManagedConnection(dbCommandFactory =>
+                {
+                    var journal = journalFactory();
+                    journal.StoreExecutedScript(script, dbCommandFactory);
+                });
+            }
+        }
+        catch (DbException sqlException)
+        {
+            Log().LogInformation("DB exception has occurred in script: '{0}'", script.Name);
+            Log().LogError(
                     "Script block number: {0}; Error Code: {1}; Message: {2}",
                     index,
                     sqlException.ErrorCode > 0 ? sqlException.ErrorCode : "(NONE)",
                     sqlException.Message);
-                throw;
-            }
+            throw;
         }
+        catch (Exception ex)
+        {
+            Log().LogInformation("Exception has occurred in script: '{0}'", script.Name);
+            Log().LogError("{0}", ex.ToString());
+            throw;
+        }
+    }
 
     protected abstract void ExecuteCommandsWithinExceptionHandler(int index, SqlScript script, Action executeCallback);
 
@@ -204,16 +214,16 @@ public abstract class ScriptExecutor : IScriptExecutor
         return sqlObjectParser.QuoteIdentifier(objectName);
     }
 
-        protected virtual void WriteReaderToLog(IDataReader reader)
+    protected virtual void WriteReaderToLog(IDataReader reader)
+    {
+        do
         {
-            do
+            if (reader.FieldCount == 0)
             {
-                if (reader.FieldCount == 0)
-                {
-                    if (reader.RecordsAffected >= 0)
-                        Log().LogInformation("RecordsAffected: {0}", reader.RecordsAffected);
-                    return;
-                }
+                if (reader.RecordsAffected >= 0)
+                    Log().LogInformation("RecordsAffected: {0}", reader.RecordsAffected);
+                return;
+            }
 
             var names = new List<string>();
             for (var i = 0; i < reader.FieldCount; i++)
@@ -247,18 +257,18 @@ public abstract class ScriptExecutor : IScriptExecutor
             format = "|" + format;
             totalLength += 1;
 
-                var delimiterLine = new string('-', totalLength);
-                Log().LogInformation(delimiterLine);
-                Log().LogInformation(string.Format(format, names.ToArray()));
-                Log().LogInformation(delimiterLine);
-                foreach (var line in lines)
-                {
-                    Log().LogInformation(string.Format(format, line.ToArray()));
-                }
-                Log().LogInformation(delimiterLine);
-                Log().LogInformation("\r\n");
-            } while (reader.NextResult());
-        }
+            var delimiterLine = new string('-', totalLength);
+            Log().LogInformation(delimiterLine);
+            Log().LogInformation(string.Format(format, names.ToArray()));
+            Log().LogInformation(delimiterLine);
+            foreach (var line in lines)
+            {
+                Log().LogInformation(string.Format(format, line.ToArray()));
+            }
+            Log().LogInformation(delimiterLine);
+            Log().LogInformation("\r\n");
+        } while (reader.NextResult());
+    }
 
     protected Func<IUpgradeLog> Log { get; private set; }
 }

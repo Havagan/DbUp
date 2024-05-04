@@ -31,11 +31,11 @@ namespace DbUp.Builder
         /// </summary>
         public IAggregateLog Log
         {
-            get => _log;
-            internal set => _log = value ?? new AggregateLog();
+            get => log;
+            internal set => log = value ?? new AggregateLog();
         }
 
-        private IAggregateLog _log = new AggregateLog();
+        private IAggregateLog log = new AggregateLog();
 
         /// <summary>
         /// Adds additional log which captures details about the upgrade.

@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -9,13 +10,13 @@ namespace DbUp.Tests.Common.RecordingDb;
 public class RecordingDbCommand : IDbCommand
 {
     readonly CaptureLogsLogger logger;
-    readonly Dictionary<string?, Func<object>> scalarResults;
-    readonly Dictionary<string?, Func<int>> nonQueryResults;
+    readonly ConcurrentDictionary<string?, Func<object>> scalarResults;
+    readonly ConcurrentDictionary<string?, Func<int>> nonQueryResults;
 
     public RecordingDbCommand(
         CaptureLogsLogger logger,
-        Dictionary<string?, Func<object>> scalarResults,
-        Dictionary<string?, Func<int>> nonQueryResults
+        ConcurrentDictionary<string?, Func<object>> scalarResults,
+        ConcurrentDictionary<string?, Func<int>> nonQueryResults
     )
     {
         this.logger = logger;

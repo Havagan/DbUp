@@ -30,7 +30,7 @@ public class ScriptTypeScenarios
         testProvider = new TestProvider();
 
         testProvider.Builder
-            .WithScripts(new TestScriptProvider(scripts));
+            .WithScriptProvider(new TestScriptProvider(scripts));
     }
 
     [Fact]

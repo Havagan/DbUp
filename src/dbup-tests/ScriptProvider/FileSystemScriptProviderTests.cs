@@ -153,13 +153,13 @@ public class FileSystemScriptProviderTests
             }
         }
 
-            [Then]
-            public void the_files_should_contain_the_subfolder_name()
-            {
-                filesToExecute
-                        .Select(f => f.Name)
-                        .ShouldContain("Folder1.DbUp.Tests.TestScripts.Test1__9.sql");
-            }
+        [Then]
+        public void the_files_should_contain_the_subfolder_name()
+        {
+            filesToExecute
+                .Select(f => f.Name)
+                .ShouldContain("Folder1.DbUp.Tests.TestScripts.Test1__9.sql");
+        }
 
         [Then]
         public void the_files_should_be_correctly_ordered_with_subdirectory_order()
@@ -213,13 +213,13 @@ public class FileSystemScriptProviderTests
             }
         }
 
-            [Then]
-            public void the_files_should_not_contain_the_subfolder_name()
-            {
-                filesToExecute
-                        .Select(f => f.Name)
-                        .ShouldContain("DbUp.Tests.TestScripts.Test1__9.sql");
-            }
+        [Then]
+        public void the_files_should_not_contain_the_subfolder_name()
+        {
+            filesToExecute
+                .Select(f => f.Name)
+                .ShouldContain("DbUp.Tests.TestScripts.Test1__9.sql");
+        }
 
         [Then]
         public void the_files_should_be_correctly_ordered_without_subdirectory_order()

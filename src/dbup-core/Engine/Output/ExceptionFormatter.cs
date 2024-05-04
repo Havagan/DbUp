@@ -19,10 +19,10 @@ namespace DbUp.Engine.Output
                 return GetMessageTree(aggregate, indent);
 
             return string.Format("{0}{1}{3}{2}",
-              indent,
-              ex.Message.Replace(Environment.NewLine, ": "),
-              GetMessageTree(ex.InnerException, $"{indent}    "),
-              Environment.NewLine);
+                indent,
+                ex.Message.Replace(Environment.NewLine, ": "),
+                GetMessageTree(ex.InnerException, $"{indent}    "),
+                Environment.NewLine);
         }
 
         static string GetMessageTree(AggregateException ex, string indent = "")
@@ -35,8 +35,8 @@ namespace DbUp.Engine.Output
             foreach (Exception childEx in ex.InnerExceptions)
             {
                 builder
-                  .AppendLine(
-                    GetMessageTree(childEx, $"{indent}    ").TrimEnd(Environment.NewLine.ToCharArray())
+                    .AppendLine(
+                        GetMessageTree(childEx, $"{indent}    ").TrimEnd(Environment.NewLine.ToCharArray())
                     );
             }
 

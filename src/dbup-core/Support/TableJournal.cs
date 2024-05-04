@@ -56,13 +56,13 @@ public abstract class TableJournal : IJournal
 
     protected Func<IUpgradeLog> Log { get; private set; }
 
-        public string[] GetExecutedScripts()
+    public string[] GetExecutedScripts()
+    {
+        return ConnectionManager().ExecuteCommandsWithManagedConnection(dbCommandFactory =>
         {
-            return ConnectionManager().ExecuteCommandsWithManagedConnection(dbCommandFactory =>
+            if (journalExists || DoesTableExist(dbCommandFactory))
             {
-                if (journalExists || DoesTableExist(dbCommandFactory))
-                {
-                    Log().LogInformation("Fetching list of already executed scripts.");
+                Log().LogInformation("Fetching list of already executed scripts.");
 
                 var scripts = new List<string>();
 
@@ -75,15 +75,15 @@ public abstract class TableJournal : IJournal
                     }
                 }
 
-                    return scripts.ToArray();
-                }
-                else
-                {
-                    Log().LogInformation("Journal table does not exist");
-                    return new string[0];
-                }
-            });
-        }
+                return scripts.ToArray();
+            }
+            else
+            {
+                Log().LogInformation("Journal table does not exist");
+                return new string[0];
+            }
+        });
+    }
 
     /// <summary>
     /// Records a database upgrade for a database specified in a given connection string.
@@ -168,18 +168,18 @@ public abstract class TableJournal : IJournal
         // TODO: Now we could run any migration scripts on it using some mechanism to make sure the table is ready for use.
     }
 
-        public virtual void EnsureTableExistsAndIsLatestVersion(Func<IDbCommand> dbCommandFactory)
+    public virtual void EnsureTableExistsAndIsLatestVersion(Func<IDbCommand> dbCommandFactory)
+    {
+        if (!journalExists && !DoesTableExist(dbCommandFactory))
         {
-            if (!journalExists && !DoesTableExist(dbCommandFactory))
+            Log().LogInformation(string.Format("Creating the {0} table", FqSchemaTableName));
+            // We will never change the schema of the initial table create.
+            using (var command = GetCreateTableCommand(dbCommandFactory))
             {
-                Log().LogInformation(string.Format("Creating the {0} table", FqSchemaTableName));
-                // We will never change the schema of the initial table create.
-                using (var command = GetCreateTableCommand(dbCommandFactory))
-                {
-                    command.ExecuteNonQuery();
-                }
+                command.ExecuteNonQuery();
+            }
 
-                Log().LogInformation(string.Format("The {0} table has been created", FqSchemaTableName));
+            Log().LogInformation(string.Format("The {0} table has been created", FqSchemaTableName));
 
             OnTableCreated(dbCommandFactory);
         }
@@ -187,17 +187,17 @@ public abstract class TableJournal : IJournal
         journalExists = true;
     }
 
-        protected virtual bool DoesTableExist(Func<IDbCommand> dbCommandFactory)
+    protected virtual bool DoesTableExist(Func<IDbCommand> dbCommandFactory)
+    {
+        Log().LogInformation("Checking whether journal table exists");
+        using (var command = dbCommandFactory())
         {
-            Log().LogInformation("Checking whether journal table exists");
-            using (var command = dbCommandFactory())
-            {
-                command.CommandText = DoesTableExistSql();
-                command.CommandType = CommandType.Text;
-                var executeScalar = Convert.ToInt32(command.ExecuteScalar());
-                return executeScalar == 1;
-            }
+            command.CommandText = DoesTableExistSql();
+            command.CommandType = CommandType.Text;
+            var executeScalar = Convert.ToInt32(command.ExecuteScalar());
+            return executeScalar == 1;
         }
+    }
 
     /// <summary>Verify, using database-specific queries, if the table exists in the database.</summary>
     /// <returns>1 if table exists, 0 otherwise</returns>

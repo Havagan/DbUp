@@ -30,15 +30,15 @@ public class UpgradeDatabaseScenarios
         testProvider.Builder.WithScriptProvider(new TestScriptProvider(scripts));
     }
 
-        [Fact]
-        public void AttemptingToUpgradeAnUpToDateDatabase()
-        {
-            this.Given(t => t.GivenAnUpToDateDatabase())
-                .When(t => t.WhenDatabaseIsUpgraded())
-                .Then(t => t.ThenShouldNotRunAnyScripts())
-                .And(t => t.ThenShouldHaveSuccessfulResult())
-                .BDDfy();
-        }
+    [Fact]
+    public void AttemptingToUpgradeAnUpToDateDatabase()
+    {
+        this.Given(t => t.GivenAnUpToDateDatabase())
+            .When(t => t.WhenDatabaseIsUpgraded())
+            .Then(t => t.ThenShouldNotRunAnyScripts())
+            .And(t => t.ThenShouldHaveSuccessfulResult())
+            .BDDfy();
+    }
 
     [Fact]
     public void UpgradingAnOutOfDateDatabase()
@@ -51,14 +51,14 @@ public class UpgradeDatabaseScenarios
             .BDDfy();
     }
 
-        [Fact]
-        public void IsUpdateRequestedForAnUpToDateDatabase()
-        {
-            this.Given(t => t.GivenAnUpToDateDatabase())
-                .When(t => t.WhenDatabaseIsUpgraded())
-                .Then(t => t.ThenUpgradeShouldNotBeRequired())
-                .BDDfy();
-        }
+    [Fact]
+    public void IsUpdateRequestedForAnUpToDateDatabase()
+    {
+        this.Given(t => t.GivenAnUpToDateDatabase())
+            .When(t => t.WhenDatabaseIsUpgraded())
+            .Then(t => t.ThenUpgradeShouldNotBeRequired())
+            .BDDfy();
+    }
 
     [Fact]
     public void IsUpdateRequestedForOutOfDateDatabase()

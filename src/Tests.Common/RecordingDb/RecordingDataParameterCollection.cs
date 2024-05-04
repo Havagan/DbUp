@@ -4,17 +4,17 @@ using System.Collections.Concurrent;
 using System.Data;
 using DbUp.Engine.Output;
 
-namespace DbUp.Tests.Common.RecordingDb
-{
+namespace DbUp.Tests.Common.RecordingDb;
+
     class RecordingDataParameterCollection : IDataParameterCollection
     {
         readonly IUpgradeLog logger;
-        readonly ConcurrentBag<object> backingList;
+        readonly ConcurrentBag<object?> backingList;
 
         public RecordingDataParameterCollection(IUpgradeLog logger)
         {
             this.logger = logger;
-            backingList = new ConcurrentBag<object>();
+            backingList = new ConcurrentBag<object?>();
         }
 
         public IEnumerator GetEnumerator()
@@ -27,51 +27,52 @@ namespace DbUp.Tests.Common.RecordingDb
             throw new NotImplementedException();
         }
 
-        public int Count { get; private set; }
-        public object? SyncRoot { get; private set; }
-        public bool IsSynchronized { get; private set; }
-        public int Add(object value)
-        {
-            logger.LogInformation("DB Operation: Add parameter to command: {0}", value);
-            backingList.Add(value);
-            return backingList.Count - 1;
-        }
+    public int Count { get; private set; }
+    public object SyncRoot { get; private set; } = new();
+    public bool IsSynchronized { get; private set; }
 
-        public bool Contains(object value)
-        {
-            throw new NotImplementedException();
-        }
+    public int Add(object? value)
+    {
+        logger.LogInformation("DB Operation: Add parameter to command: {0}", value);
+        backingList.Add(value);
+        return backingList.Count - 1;
+    }
+
+    public bool Contains(object? value)
+    {
+        throw new NotImplementedException();
+    }
 
         public void Clear()
         {
             throw new NotImplementedException();
         }
 
-        public int IndexOf(object value)
-        {
-            throw new NotImplementedException();
-        }
+    public int IndexOf(object? value)
+    {
+        throw new NotImplementedException();
+    }
 
-        public void Insert(int index, object value)
-        {
-            throw new NotImplementedException();
-        }
+    public void Insert(int index, object? value)
+    {
+        throw new NotImplementedException();
+    }
 
-        public void Remove(object value)
-        {
-            throw new NotImplementedException();
-        }
+    public void Remove(object? value)
+    {
+        throw new NotImplementedException();
+    }
 
         public void RemoveAt(int index)
         {
             throw new NotImplementedException();
         }
 
-        object IList.this[int index]
-        {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
-        }
+    object? IList.this[int index]
+    {
+        get => throw new NotImplementedException();
+        set => throw new NotImplementedException();
+    }
 
         public bool IsReadOnly { get; private set; }
         public bool IsFixedSize { get; private set; }
@@ -97,4 +98,3 @@ namespace DbUp.Tests.Common.RecordingDb
             set => throw new NotImplementedException();
         }
     }
-}

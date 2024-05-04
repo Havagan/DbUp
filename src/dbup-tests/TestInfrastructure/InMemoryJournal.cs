@@ -24,7 +24,7 @@ public class InMemoryJournal : IJournal
 
     public void EnsureTableExistsAndIsLatestVersion(Func<IDbCommand> dbCommandFactory)
     {
-        log.LogInformation("Ensuring the journal table exists and is latest version");
+        log.LogInformation("Ensuring tables exists and is latest version");
     }
 
     public void AddScriptsAsPreviouslyExecuted(IReadOnlyList<SqlScript> scripts)

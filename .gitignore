@@ -3,5 +3,6 @@ bin/
 obj
 /artifacts/*
 /src/dbup-tests/**/*received.txt
-/tools/*
+tools
 .idea
+DbUp.sln.DotSettings.user

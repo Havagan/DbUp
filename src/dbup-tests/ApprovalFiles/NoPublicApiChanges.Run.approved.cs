@@ -1,4 +1,4 @@
-﻿[assembly: System.CLSCompliantAttribute(true)]
+[assembly: System.CLSCompliantAttribute(true)]
 [assembly: System.Runtime.InteropServices.ComVisibleAttribute(false)]
 [assembly: System.Runtime.InteropServices.GuidAttribute("9f833e49-6e35-4e4d-b2a0-3d4fed527c89")]
 
@@ -23,7 +23,7 @@ public static class StandardExtensions
     public static DbUp.Builder.UpgradeEngineBuilder WithScript(this DbUp.Builder.UpgradeEngineBuilder builder, string name, string contents, DbUp.Engine.SqlScriptOptions sqlScriptOptions) { }
     public static DbUp.Builder.UpgradeEngineBuilder WithScript(this DbUp.Builder.UpgradeEngineBuilder builder, string name, DbUp.Engine.IScript script, DbUp.Engine.SqlScriptOptions sqlScriptOptions) { }
     public static DbUp.Builder.UpgradeEngineBuilder WithScriptNameComparer(this DbUp.Builder.UpgradeEngineBuilder builder, System.Collections.Generic.IComparer<string> comparer) { }
-    public static DbUp.Builder.UpgradeEngineBuilder WithScripts(this DbUp.Builder.UpgradeEngineBuilder builder, DbUp.Engine.IScriptProvider scriptProvider) { }
+    public static DbUp.Builder.UpgradeEngineBuilder WithScriptProvider(this DbUp.Builder.UpgradeEngineBuilder builder, DbUp.Engine.IScriptProvider scriptProvider) { }
     public static DbUp.Builder.UpgradeEngineBuilder WithScripts(this DbUp.Builder.UpgradeEngineBuilder builder, System.Collections.Generic.IEnumerable<DbUp.Engine.SqlScript> scripts) { }
     public static DbUp.Builder.UpgradeEngineBuilder WithScripts(this DbUp.Builder.UpgradeEngineBuilder builder, params DbUp.Engine.SqlScript[] scripts) { }
     public static DbUp.Builder.UpgradeEngineBuilder WithScripts(this DbUp.Builder.UpgradeEngineBuilder builder, params DbUp.Engine.IScript[] scripts) { }
@@ -131,10 +131,10 @@ namespace DbUp.Builder
     }
     public class UpgradeEngineBuilder
     {
-        protected readonly System.Collections.Generic.List<System.Action<DbUp.Builder.UpgradeConfiguration>> callbacks;
+        protected readonly System.Collections.Concurrent.ConcurrentQueue<System.Action<DbUp.Builder.UpgradeConfiguration>> callbacks;
         public UpgradeEngineBuilder() { }
         public virtual DbUp.Engine.UpgradeEngine Build() { }
-        public virtual DbUp.Builder.UpgradeConfiguration BuildConfiguration() { }
+        protected virtual DbUp.Builder.UpgradeConfiguration BuildConfiguration() { }
         public virtual void Configure(System.Action<DbUp.Builder.UpgradeConfiguration> configuration) { }
     }
 }
@@ -142,8 +142,6 @@ namespace DbUp.Engine
 {
     public sealed class DatabaseUpgradeResult
     {
-        [System.ObsoleteAttribute()]
-        public DatabaseUpgradeResult(System.Collections.Generic.IEnumerable<DbUp.Engine.SqlScript> scripts, bool successful, System.Exception error) { }
         public DatabaseUpgradeResult(System.Collections.Generic.IEnumerable<DbUp.Engine.SqlScript> scripts, bool successful, System.Exception error, DbUp.Engine.SqlScript errorScript) { }
         public System.Exception Error { get; }
         public DbUp.Engine.SqlScript ErrorScript { get; }
@@ -350,6 +348,7 @@ namespace DbUp.Engine.Transactions
         protected DatabaseConnectionManager(System.Func<DbUp.Engine.Output.IUpgradeLog, System.Data.IDbConnection> connectionFactory) { }
         protected DatabaseConnectionManager(DbUp.Engine.Transactions.IConnectionFactory connectionFactory) { }
         protected virtual DbUp.Engine.Transactions.AllowedTransactionMode AllowedTransactionModes { get; }
+        public System.Nullable<int> ExecutionTimeoutSeconds { get; set; }
         public bool IsScriptOutputLogged { get; set; }
         public DbUp.Engine.Transactions.TransactionMode TransactionMode { get; set; }
         public T ExecuteCommandsWithManagedConnection<T>(Func<System.Func<System.Data.IDbCommand>, T> actionWithResult) { }
@@ -371,6 +370,7 @@ namespace DbUp.Engine.Transactions
     }
     public interface IConnectionManager
     {
+        System.Nullable<int> ExecutionTimeoutSeconds { get; set; }
         bool IsScriptOutputLogged { get; set; }
         DbUp.Engine.Transactions.TransactionMode TransactionMode { get; set; }
         T ExecuteCommandsWithManagedConnection<T>(Func<System.Func<System.Data.IDbCommand>, T> actionWithResult);
@@ -383,7 +383,7 @@ namespace DbUp.Engine.Transactions
     {
         T Execute<T>(Func<System.Func<System.Data.IDbCommand>, T> actionWithResult);
         void Execute(System.Action<System.Func<System.Data.IDbCommand>> action);
-        void Initialise(System.Data.IDbConnection dbConnection, DbUp.Engine.Output.IUpgradeLog upgradeLog, System.Collections.Generic.List<DbUp.Engine.SqlScript> executedScripts);
+        void Initialise(System.Data.IDbConnection dbConnection, DbUp.Engine.Output.IUpgradeLog upgradeLog, System.Collections.Generic.List<DbUp.Engine.SqlScript> executedScripts, System.Nullable<int> executionTimeoutSeconds);
     }
     public enum TransactionMode : int
     {
@@ -502,6 +502,7 @@ namespace DbUp.Support
     public class SqlCommandReader : DbUp.Support.SqlParser, System.IDisposable
     {
         public SqlCommandReader(string sqlText, string delimiter = "GO", bool delimiterRequiresWhitespace = true) { }
+        protected string GetCurrentCommandTextFromBuffer() { }
         public void ReadAllCommands(System.Action<string> handleCommand) { }
     }
     public class SqlCommandSplitter

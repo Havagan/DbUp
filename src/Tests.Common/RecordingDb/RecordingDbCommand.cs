@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using DbUp.Engine;
 
 namespace DbUp.Tests.Common.RecordingDb;
@@ -10,13 +11,13 @@ namespace DbUp.Tests.Common.RecordingDb;
 public class RecordingDbCommand : IDbCommand
 {
     readonly CaptureLogsLogger logger;
-    readonly ConcurrentDictionary<string?, Func<object>> scalarResults;
-    readonly ConcurrentDictionary<string?, Func<int>> nonQueryResults;
+    readonly ConcurrentDictionary<string, Func<object>> scalarResults;
+    readonly ConcurrentDictionary<string, Func<int>> nonQueryResults;
 
     public RecordingDbCommand(
         CaptureLogsLogger logger,
-        ConcurrentDictionary<string?, Func<object>> scalarResults,
-        ConcurrentDictionary<string?, Func<int>> nonQueryResults
+        ConcurrentDictionary<string, Func<object>> scalarResults,
+        ConcurrentDictionary<string, Func<int>> nonQueryResults
     )
     {
         this.logger = logger;
@@ -112,7 +113,9 @@ public class RecordingDbCommand : IDbCommand
     /// <summary>
     /// Set to 'error' to throw when executed
     /// </summary>
-    public string? CommandText { get; set; }
+#pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
+    public string CommandText { get; set; } = "";
+#pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
 
     public int CommandTimeout { get; set; }
 

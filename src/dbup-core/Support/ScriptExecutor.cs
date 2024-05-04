@@ -158,12 +158,12 @@ public abstract class ScriptExecutor : IScriptExecutor
                     }
                 }
 
-                if (UseTheSameTransactionForJournalTableAndScripts)
+                if (UseTheSameTransactionForJournalTableAndScripts && ShouldJournalScript(script))
                 {
                     journal.StoreExecutedScript(script, dbCommandFactory);
                 }
             });
-            if (!UseTheSameTransactionForJournalTableAndScripts)
+            if (!UseTheSameTransactionForJournalTableAndScripts && ShouldJournalScript(script))
             {
                 connectionManager.ExecuteCommandsWithManagedConnection(dbCommandFactory =>
                 {
@@ -175,11 +175,8 @@ public abstract class ScriptExecutor : IScriptExecutor
         catch (DbException sqlException)
         {
             Log().LogInformation("DB exception has occurred in script: '{0}'", script.Name);
-            Log().LogError(
-                    "Script block number: {0}; Error Code: {1}; Message: {2}",
-                    index,
-                    sqlException.ErrorCode > 0 ? sqlException.ErrorCode : "(NONE)",
-                    sqlException.Message);
+            Log().LogError("Script block number: {0}; Message: {1}", index, sqlException.Message);
+            Log().LogError("{0}", sqlException.ToString());
             throw;
         }
         catch (Exception ex)
@@ -188,6 +185,16 @@ public abstract class ScriptExecutor : IScriptExecutor
             Log().LogError("{0}", ex.ToString());
             throw;
         }
+    }
+
+    /// <summary>
+    /// Scripts should only be journaled if they are only to be run once.
+    /// Scripts which need to run every time should not be recorded.
+    /// </summary>
+    /// <param name="script"></param>
+    bool ShouldJournalScript(SqlScript script)
+    {
+        return script.SqlScriptOptions.ScriptType == ScriptType.RunOnce;
     }
 
     protected abstract void ExecuteCommandsWithinExceptionHandler(int index, SqlScript script, Action executeCallback);
@@ -265,6 +272,7 @@ public abstract class ScriptExecutor : IScriptExecutor
             {
                 Log().LogInformation(string.Format(format, line.ToArray()));
             }
+
             Log().LogInformation(delimiterLine);
             Log().LogInformation("\r\n");
         } while (reader.NextResult());

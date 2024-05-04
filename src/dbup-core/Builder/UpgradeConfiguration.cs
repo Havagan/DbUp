@@ -6,48 +6,48 @@ using DbUp.Engine.Output;
 using DbUp.Engine.Transactions;
 using DbUp.Support;
 
-namespace DbUp.Builder
+namespace DbUp.Builder;
+
+/// <summary>
+/// Represents the configuration of an UpgradeEngine.
+/// </summary>
+public class UpgradeConfiguration
 {
     /// <summary>
-    /// Represents the configuration of an UpgradeEngine.
+    /// Initializes a new instance of the <see cref="UpgradeConfiguration"/> class.
     /// </summary>
-    public class UpgradeConfiguration
+    public UpgradeConfiguration()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UpgradeConfiguration"/> class.
-        /// </summary>
-        public UpgradeConfiguration()
-        {
-            VariablesEnabled = true;
-        }
+        VariablesEnabled = true;
+    }
 
     /// <summary>
     /// Manages your database connections, allowing you to control the use of transactions and the behaviour of those transactions
     /// </summary>
     public IConnectionManager ConnectionManager { get; set; }
 
-        /// <summary>
-        /// Gets or sets an aggregate logger which captures details about the upgrade.
-        /// </summary>
-        public IAggregateLog Log
-        {
-            get => log;
-            internal set => log = value ?? new AggregateLog();
-        }
+    /// <summary>
+    /// Gets or sets an aggregate logger which captures details about the upgrade.
+    /// </summary>
+    public IAggregateLog Log
+    {
+        get => _log;
+        internal set => _log = value ?? new AggregateLog();
+    }
 
-        private IAggregateLog log = new AggregateLog();
+    private IAggregateLog _log = new AggregateLog();
 
-        /// <summary>
-        /// Adds additional log which captures details about the upgrade.
-        /// </summary>
-        /// <param name="additionalLog"></param>
-        public void AddLog(IUpgradeLog logger)
+    /// <summary>
+    /// Adds additional log which captures details about the upgrade.
+    /// </summary>
+    /// <param name="additionalLog"></param>
+    public void AddLog(IUpgradeLog logger)
+    {
+        if (logger is not null)
         {
-            if (logger is not null)
-            {
-                this.Log.AddLogger(logger);
-            }
+            this.Log.AddLogger(logger);
         }
+    }
 
     /// <summary>
     /// Gets a mutable list of script providers.
@@ -92,28 +92,27 @@ namespace DbUp.Builder
     /// </summary>
     public bool VariablesEnabled { get; set; }
 
-        /// <summary>
-        /// Ensures all expectations have been met regarding this configuration.
-        /// </summary>
-        public void Validate()
-        {
-            if (Log == null) throw new ArgumentException("A log is required to build a database upgrader. Please use one of the logging extension methods.");
-            if (ScriptExecutor == null) throw new ArgumentException("A ScriptExecutor is required.");
-            if (Journal == null) throw new ArgumentException("A journal is required. Please use one of the Journal extension methods before calling Build().");
-            if (ScriptProviders.Count == 0) throw new ArgumentException("No script providers were added. Please use one of the WithScripts extension methods before calling Build().");
-            if (ConnectionManager == null) throw new ArgumentException("The ConnectionManager is null. What do you expect to upgrade?");
-        }
+    /// <summary>
+    /// Ensures all expectations have been met regarding this configuration.
+    /// </summary>
+    public void Validate()
+    {
+        if (Log == null) throw new ArgumentException("A log is required to build a database upgrader. Please use one of the logging extension methods.");
+        if (ScriptExecutor == null) throw new ArgumentException("A ScriptExecutor is required.");
+        if (Journal == null) throw new ArgumentException("A journal is required. Please use one of the Journal extension methods before calling Build().");
+        if (ScriptProviders.Count == 0) throw new ArgumentException("No script providers were added. Please use one of the WithScripts extension methods before calling Build().");
+        if (ConnectionManager == null) throw new ArgumentException("The ConnectionManager is null. What do you expect to upgrade?");
+    }
 
-        /// <summary>
-        /// Adds variables to the configuration which will be substituted for every script
-        /// </summary>
-        /// <param name="newVariables">The variables </param>
-        public void AddVariables(IDictionary<string, string> newVariables)
+    /// <summary>
+    /// Adds variables to the configuration which will be substituted for every script
+    /// </summary>
+    /// <param name="newVariables">The variables </param>
+    public void AddVariables(IDictionary<string, string> newVariables)
+    {
+        foreach (var variable in newVariables ?? throw new ArgumentNullException(nameof(newVariables)))
         {
-            foreach (var variable in newVariables ?? throw new ArgumentNullException(nameof(newVariables)))
-            {
-                Variables.Add(variable.Key, variable.Value);
-            }
+            Variables.Add(variable.Key, variable.Value);
         }
     }
 }

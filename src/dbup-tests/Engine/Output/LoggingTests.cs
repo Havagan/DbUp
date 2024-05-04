@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using DbUp.Tests.TestInfrastructure;
 using Microsoft.Extensions.Logging;
 using Serilog;

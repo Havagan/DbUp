@@ -2,14 +2,15 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using DbUp.Engine;
 
 namespace DbUp.Tests.Common.RecordingDb;
 
 public class RecordingDbConnection : IDbConnection
 {
-    readonly ConcurrentDictionary<string?, Func<object>> scalarResults = new();
-    readonly ConcurrentDictionary<string?, Func<int>> nonQueryResults = new();
+    readonly ConcurrentDictionary<string, Func<object>> scalarResults = new();
+    readonly ConcurrentDictionary<string, Func<int>> nonQueryResults = new();
     readonly CaptureLogsLogger logger;
 
     public RecordingDbConnection(CaptureLogsLogger logger)
@@ -58,20 +59,22 @@ public class RecordingDbConnection : IDbConnection
         logger.WriteDbOperation("Dispose connection");
     }
 
-    public string? ConnectionString { get; set; }
+#pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
+    public string ConnectionString { get; set; } = "";
+#pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
 
     public int ConnectionTimeout { get; private set; }
 
-    public string? Database { get; private set; }
+    public string Database { get; private set; } = "Test Database";
 
     public ConnectionState State { get; private set; }
 
-    public void SetupScalarResult(string? sql, Func<object> action)
+    public void SetupScalarResult(string sql, Func<object> action)
     {
         scalarResults.TryAdd(sql, action);
     }
 
-    public void SetupNonQueryResult(string? sql, Func<int> result)
+    public void SetupNonQueryResult(string sql, Func<int> result)
     {
         nonQueryResults.TryAdd(sql, result);
     }

@@ -16,7 +16,7 @@ namespace DbUp.Tests.Common
         public ConcurrentBag<string> WarnMessages { get; } = new ConcurrentBag<string>();
         public ConcurrentBag<string> ErrorMessages { get; } = new ConcurrentBag<string>();
 
-        public string Log => logBuilder.ToString();
+    public string Log => logBuilder.ToString();
 
         public void LogInformation(string format, params object[] args)
         {

@@ -3,62 +3,62 @@ using System.Collections.Generic;
 using System.Linq;
 using DbUp.Builder;
 
-namespace DbUp.Engine
+namespace DbUp.Engine;
+
+/// <summary>
+/// This class orchestrates the database upgrade process.
+/// </summary>
+public class UpgradeEngine
 {
+    protected readonly UpgradeConfiguration configuration;
+
     /// <summary>
-    /// This class orchestrates the database upgrade process.
+    /// Initializes a new instance of the <see cref="UpgradeEngine"/> class.
     /// </summary>
-    public class UpgradeEngine
+    /// <param name="configuration">The configuration.</param>
+    public UpgradeEngine(UpgradeConfiguration configuration)
     {
-        protected readonly UpgradeConfiguration configuration;
+        this.configuration = configuration;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UpgradeEngine"/> class.
-        /// </summary>
-        /// <param name="configuration">The configuration.</param>
-        public UpgradeEngine(UpgradeConfiguration configuration)
-        {
-            this.configuration = configuration;
-        }
+    /// <summary>
+    /// An event that is raised after each script is executed.
+    /// </summary>
+    public event EventHandler ScriptExecuted;
 
-        /// <summary>
-        /// An event that is raised after each script is executed.
-        /// </summary>
-        public event EventHandler ScriptExecuted;
+    /// <summary>
+    /// Invokes the <see cref="ScriptExecuted"/> event; called whenever a script is executed.
+    /// </summary>
+    /// <param name="e"></param>
+    protected virtual void OnScriptExecuted(ScriptExecutedEventArgs e)
+    {
+        ScriptExecuted?.Invoke(this, e);
+    }
 
-        /// <summary>
-        /// Invokes the <see cref="ScriptExecuted"/> event; called whenever a script is executed.
-        /// </summary>
-        /// <param name="e"></param>
-        protected virtual void OnScriptExecuted(ScriptExecutedEventArgs e)
-        {
-            ScriptExecuted?.Invoke(this, e);
-        }
+    /// <summary>
+    /// Determines whether the database is out of date and can be upgraded.
+    /// </summary>
+    public virtual bool IsUpgradeRequired()
+    {
+        return GetScriptsToExecute().Count() != 0;
+    }
 
-        /// <summary>
-        /// Determines whether the database is out of date and can be upgraded.
-        /// </summary>
-        public virtual bool IsUpgradeRequired()
-        {
-            return GetScriptsToExecute().Count() != 0;
-        }
+    /// <summary>
+    /// Tries to connect to the database.
+    /// </summary>
+    /// <param name="errorMessage">Any error message encountered.</param>
+    /// <returns></returns>
+    public virtual bool TryConnect(out string errorMessage)
+    {
+        return configuration.ConnectionManager.TryConnect(configuration.Log, out errorMessage);
+    }
 
-        /// <summary>
-        /// Tries to connect to the database.
-        /// </summary>
-        /// <param name="errorMessage">Any error message encountered.</param>
-        /// <returns></returns>
-        public virtual bool TryConnect(out string errorMessage)
-        {
-            return configuration.ConnectionManager.TryConnect(configuration.Log, out errorMessage);
-        }
-
-        /// <summary>
-        /// Performs the database upgrade.
-        /// </summary>
-        public virtual DatabaseUpgradeResult PerformUpgrade()
-        {
-            var executed = new List<SqlScript>();
+    /// <summary>
+    /// Performs the database upgrade.
+    /// </summary>
+    public virtual DatabaseUpgradeResult PerformUpgrade()
+    {
+        var executed = new List<SqlScript>();
 
             SqlScript executedScript = null;
             try
@@ -67,7 +67,7 @@ namespace DbUp.Engine
                 {
                     configuration.Log.LogInformation("Beginning database upgrade");
 
-                    var scriptsToExecute = GetScriptsToExecuteInsideOperation();
+                var scriptsToExecute = GetScriptsToExecuteInsideOperation();
 
                     if (scriptsToExecute.Count == 0)
                     {
@@ -75,18 +75,18 @@ namespace DbUp.Engine
                         return new DatabaseUpgradeResult(executed, true, null, null);
                     }
 
-                    configuration.ScriptExecutor.VerifySchema();
+                configuration.ScriptExecutor.VerifySchema();
 
-                    foreach (var script in scriptsToExecute)
-                    {
-                        executedScript = script;
+                foreach (var script in scriptsToExecute)
+                {
+                    executedScript = script;
 
-                        configuration.ScriptExecutor.Execute(script, configuration.Variables);
+                    configuration.ScriptExecutor.Execute(script, configuration.Variables);
 
-                        OnScriptExecuted(new ScriptExecutedEventArgs(script, configuration.ConnectionManager));
+                    OnScriptExecuted(new ScriptExecutedEventArgs(script, configuration.ConnectionManager));
 
-                        executed.Add(script);
-                    }
+                    executed.Add(script);
+                }
 
                     configuration.Log.LogInformation("Upgrade successful");
                     return new DatabaseUpgradeResult(executed, true, null, null);
@@ -103,66 +103,66 @@ namespace DbUp.Engine
             }
         }
 
-        /// <summary>
-        /// Returns a list of scripts that will be executed when the upgrade is performed
-        /// </summary>
-        /// <returns>The scripts to be executed</returns>
-        public virtual List<SqlScript> GetScriptsToExecute()
+    /// <summary>
+    /// Returns a list of scripts that will be executed when the upgrade is performed
+    /// </summary>
+    /// <returns>The scripts to be executed</returns>
+    public virtual List<SqlScript> GetScriptsToExecute()
+    {
+        using (configuration.ConnectionManager.OperationStarting(configuration.Log, new List<SqlScript>()))
         {
-            using (configuration.ConnectionManager.OperationStarting(configuration.Log, new List<SqlScript>()))
+            return GetScriptsToExecuteInsideOperation();
+        }
+    }
+
+    public virtual List<string> GetExecutedButNotDiscoveredScripts()
+    {
+        return GetExecutedScripts().Except(GetDiscoveredScriptsAsEnumerable().Select(x => x.Name)).ToList();
+    }
+
+    public virtual List<SqlScript> GetDiscoveredScripts()
+    {
+        return GetDiscoveredScriptsAsEnumerable().ToList();
+    }
+
+    IEnumerable<SqlScript> GetDiscoveredScriptsAsEnumerable()
+    {
+        return configuration.ScriptProviders.SelectMany(scriptProvider => scriptProvider.GetScripts(configuration.ConnectionManager));
+    }
+
+    List<SqlScript> GetScriptsToExecuteInsideOperation()
+    {
+        var allScripts = GetDiscoveredScriptsAsEnumerable();
+        var executedScriptNames = new HashSet<string>(configuration.Journal.GetExecutedScripts());
+
+        var sorted = allScripts.OrderBy(s => s.SqlScriptOptions.RunGroupOrder).ThenBy(s => s.Name, configuration.ScriptNameComparer);
+        var filtered = configuration.ScriptFilter.Filter(sorted, executedScriptNames, configuration.ScriptNameComparer);
+        return filtered.ToList();
+    }
+
+    public virtual List<string> GetExecutedScripts()
+    {
+        using (configuration.ConnectionManager.OperationStarting(configuration.Log, new List<SqlScript>()))
+        {
+            return configuration.Journal.GetExecutedScripts()
+                .ToList();
+        }
+    }
+
+    ///<summary>
+    /// Creates version record for any new migration scripts without executing them.
+    /// Useful for bringing development environments into sync with automated environments
+    ///</summary>
+    ///<returns></returns>
+    public virtual DatabaseUpgradeResult MarkAsExecuted()
+    {
+        var marked = new List<SqlScript>();
+        SqlScript executedScript = null;
+        using (configuration.ConnectionManager.OperationStarting(configuration.Log, marked))
+        {
+            try
             {
-                return GetScriptsToExecuteInsideOperation();
-            }
-        }
-
-        public virtual List<string> GetExecutedButNotDiscoveredScripts()
-        {
-            return GetExecutedScripts().Except(GetDiscoveredScriptsAsEnumerable().Select(x => x.Name)).ToList();
-        }
-
-        public virtual List<SqlScript> GetDiscoveredScripts()
-        {
-            return GetDiscoveredScriptsAsEnumerable().ToList();
-        }
-
-        IEnumerable<SqlScript> GetDiscoveredScriptsAsEnumerable()
-        {
-            return configuration.ScriptProviders.SelectMany(scriptProvider => scriptProvider.GetScripts(configuration.ConnectionManager));
-        }
-
-        List<SqlScript> GetScriptsToExecuteInsideOperation()
-        {
-            var allScripts = GetDiscoveredScriptsAsEnumerable();
-            var executedScriptNames = new HashSet<string>(configuration.Journal.GetExecutedScripts());
-
-            var sorted = allScripts.OrderBy(s => s.SqlScriptOptions.RunGroupOrder).ThenBy(s => s.Name, configuration.ScriptNameComparer);
-            var filtered = configuration.ScriptFilter.Filter(sorted, executedScriptNames, configuration.ScriptNameComparer);
-            return filtered.ToList();
-        }
-
-        public virtual List<string> GetExecutedScripts()
-        {
-            using (configuration.ConnectionManager.OperationStarting(configuration.Log, new List<SqlScript>()))
-            {
-                return configuration.Journal.GetExecutedScripts()
-                    .ToList();
-            }
-        }
-
-        ///<summary>
-        /// Creates version record for any new migration scripts without executing them.
-        /// Useful for bringing development environments into sync with automated environments
-        ///</summary>
-        ///<returns></returns>
-        public virtual DatabaseUpgradeResult MarkAsExecuted()
-        {
-            var marked = new List<SqlScript>();
-            SqlScript executedScript = null;
-            using (configuration.ConnectionManager.OperationStarting(configuration.Log, marked))
-            {
-                try
-                {
-                    var scriptsToExecute = GetScriptsToExecuteInsideOperation();
+                var scriptsToExecute = GetScriptsToExecuteInsideOperation();
 
                     foreach (var script in scriptsToExecute)
                     {
@@ -184,15 +184,15 @@ namespace DbUp.Engine
             }
         }
 
-        public virtual DatabaseUpgradeResult MarkAsExecuted(string latestScript)
+    public virtual DatabaseUpgradeResult MarkAsExecuted(string latestScript)
+    {
+        var marked = new List<SqlScript>();
+        SqlScript executedScript = null;
+        using (configuration.ConnectionManager.OperationStarting(configuration.Log, marked))
         {
-            var marked = new List<SqlScript>();
-            SqlScript executedScript = null;
-            using (configuration.ConnectionManager.OperationStarting(configuration.Log, marked))
+            try
             {
-                try
-                {
-                    var scriptsToExecute = GetScriptsToExecuteInsideOperation();
+                var scriptsToExecute = GetScriptsToExecuteInsideOperation();
 
                     foreach (var script in scriptsToExecute)
                     {

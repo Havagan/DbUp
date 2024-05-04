@@ -324,7 +324,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, Func<string, bool> filter)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() { Filter = filter }));
+        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Filter = filter}));
     }
 
     /// <summary>
@@ -339,7 +339,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, Func<string, bool> filter, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() { Filter = filter }, sqlScriptOptions));
+        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Filter = filter}, sqlScriptOptions));
     }
 
     /// <summary>
@@ -353,7 +353,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, Encoding encoding)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() { Encoding = encoding }));
+        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Encoding = encoding}));
     }
 
     /// <summary>
@@ -368,7 +368,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, Encoding encoding, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() { Encoding = encoding }, sqlScriptOptions));
+        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Encoding = encoding}, sqlScriptOptions));
     }
 
     /// <summary>
@@ -383,7 +383,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, Func<string, bool> filter, Encoding encoding)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() { Filter = filter, Encoding = encoding }));
+        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Filter = filter, Encoding = encoding}));
     }
 
     /// <summary>
@@ -399,7 +399,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsFromFileSystem(this UpgradeEngineBuilder builder, string path, Func<string, bool> filter, Encoding encoding, SqlScriptOptions sqlScriptOptions)
     {
-        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() { Filter = filter, Encoding = encoding }, sqlScriptOptions));
+        return WithScripts(builder, new FileSystemScriptProvider(path, new FileSystemScriptOptions() {Filter = filter, Encoding = encoding}, sqlScriptOptions));
     }
 
     /// <summary>
@@ -557,7 +557,7 @@ public static class StandardExtensions
     /// </returns>
     public static UpgradeEngineBuilder WithScriptsAndCodeEmbeddedInAssembly(this UpgradeEngineBuilder builder, Assembly assembly)
     {
-        return WithScripts(builder, new EmbeddedScriptAndCodeProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase), s => true));
+        return WithScripts(builder, new EmbeddedScriptAndCodeProvider(assembly, s => s.EndsWith(".sql", StringComparison.OrdinalIgnoreCase), _ => true));
     }
 
     /// <summary>
@@ -703,7 +703,7 @@ public static class StandardExtensions
     /// <returns></returns>
     public static UpgradeEngineBuilder WithVariable(this UpgradeEngineBuilder builder, string variableName, string value)
     {
-        return WithVariables(builder, new Dictionary<string, string> { { variableName, value } });
+        return WithVariables(builder, new Dictionary<string, string> {{variableName, value}});
     }
 
     /// <summary>

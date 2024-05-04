@@ -21,10 +21,10 @@ namespace DbUp.Builder
             VariablesEnabled = true;
         }
 
-        /// <summary>
-        /// Manages your database connections, allowing you to control the use of transactions and the behaviour of those transactions
-        /// </summary>
-        public IConnectionManager ConnectionManager { get; set; }
+    /// <summary>
+    /// Manages your database connections, allowing you to control the use of transactions and the behaviour of those transactions
+    /// </summary>
+    public IConnectionManager ConnectionManager { get; set; }
 
         /// <summary>
         /// Gets or sets an aggregate logger which captures details about the upgrade.
@@ -49,48 +49,48 @@ namespace DbUp.Builder
             }
         }
 
-        /// <summary>
-        /// Gets a mutable list of script providers.
-        /// </summary>
-        public List<IScriptProvider> ScriptProviders { get; } = new List<IScriptProvider>();
+    /// <summary>
+    /// Gets a mutable list of script providers.
+    /// </summary>
+    public List<IScriptProvider> ScriptProviders { get; } = new();
 
-        /// <summary>
-        /// Gets a mutable list of script pre-processors.
-        /// </summary>
-        public List<IScriptPreprocessor> ScriptPreprocessors { get; } = new List<IScriptPreprocessor>();
+    /// <summary>
+    /// Gets a mutable list of script pre-processors.
+    /// </summary>
+    public List<IScriptPreprocessor> ScriptPreprocessors { get; } = new();
 
-        /// <summary>
-        /// Gets or sets the journal, which tracks the scripts that have already been run.
-        /// </summary>
-        public IJournal Journal { get; set; }
+    /// <summary>
+    /// Gets or sets the journal, which tracks the scripts that have already been run.
+    /// </summary>
+    public IJournal Journal { get; set; }
 
-        /// <summary>
-        /// Gets or sets the script executor, which runs scripts against the underlying database.
-        /// </summary>
-        public IScriptExecutor ScriptExecutor { get; set; }
+    /// <summary>
+    /// Gets or sets the script executor, which runs scripts against the underlying database.
+    /// </summary>
+    public IScriptExecutor ScriptExecutor { get; set; }
 
-        /// <summary>
-        /// Gets or sets the comparer used to sort scripts and match script names against the log of already run scripts.
-        /// The default comparer is <see cref="StringComparer.Ordinal"/>.
-        /// By implementing your own comparer you can make the matching and ordering case insensitive,
-        /// change how numbers are handled or support the renaming of scripts
-        /// </summary>
-        public ScriptNameComparer ScriptNameComparer { get; set; } = new ScriptNameComparer(StringComparer.Ordinal);
+    /// <summary>
+    /// Gets or sets the comparer used to sort scripts and match script names against the log of already run scripts.
+    /// The default comparer is <see cref="StringComparer.Ordinal"/>.
+    /// By implementing your own comparer you can make the matching and ordering case insensitive,
+    /// change how numbers are handled or support the renaming of scripts
+    /// </summary>
+    public ScriptNameComparer ScriptNameComparer { get; set; } = new(StringComparer.Ordinal);
 
-        /// <summary>
-        /// Gets or sets the script filter, which filters the scripts before execution
-        /// </summary>
-        public IScriptFilter ScriptFilter { get; set; } = new DefaultScriptFilter();
+    /// <summary>
+    /// Gets or sets the script filter, which filters the scripts before execution
+    /// </summary>
+    public IScriptFilter ScriptFilter { get; set; } = new DefaultScriptFilter();
 
-        /// <summary>
-        /// A collection of variables to be replaced in scripts before they are run
-        /// </summary>
-        public Dictionary<string, string> Variables { get; } = new Dictionary<string, string>();
+    /// <summary>
+    /// A collection of variables to be replaced in scripts before they are run
+    /// </summary>
+    public Dictionary<string, string> Variables { get; } = new();
 
-        /// <summary>
-        /// Determines if variables should be replaced in scripts before they are run.
-        /// </summary>
-        public bool VariablesEnabled { get; set; }
+    /// <summary>
+    /// Determines if variables should be replaced in scripts before they are run.
+    /// </summary>
+    public bool VariablesEnabled { get; set; }
 
         /// <summary>
         /// Ensures all expectations have been met regarding this configuration.

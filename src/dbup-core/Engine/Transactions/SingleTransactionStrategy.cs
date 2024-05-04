@@ -3,58 +3,58 @@ using System.Collections.Generic;
 using System.Data;
 using DbUp.Engine.Output;
 
-namespace DbUp.Engine.Transactions
+namespace DbUp.Engine.Transactions;
+
+class SingleTransactionStrategy : ITransactionStrategy
 {
-    class SingleTransactionStrategy : ITransactionStrategy
+    IDbConnection connection;
+    IDbTransaction transaction;
+    bool errorOccured;
+    IUpgradeLog log;
+    SqlScript[] executedScriptsListBeforeExecution;
+    List<SqlScript> executedScriptsCollection;
+
+    public void Execute(Action<Func<IDbCommand>> action)
     {
-        IDbConnection connection;
-        IDbTransaction transaction;
-        bool errorOccured;
-        IUpgradeLog log;
-        SqlScript[] executedScriptsListBeforeExecution;
-        List<SqlScript> executedScriptsCollection;
+        if (errorOccured)
+            throw new InvalidOperationException("Error occured on previous script execution");
 
-        public void Execute(Action<Func<IDbCommand>> action)
+        try
         {
-            if (errorOccured)
-                throw new InvalidOperationException("Error occured on previous script execution");
-
-            try
+            action(() =>
             {
-                action(() =>
-                {
-                    var command = connection.CreateCommand();
-                    command.Transaction = transaction;
-                    return command;
-                });
-            }
-            catch (Exception)
-            {
-                errorOccured = true;
-                throw;
-            }
+                var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                return command;
+            });
         }
-
-        public T Execute<T>(Func<Func<IDbCommand>, T> actionWithResult)
+        catch (Exception)
         {
-            if (errorOccured)
-                throw new InvalidOperationException("Error occurred on previous script execution");
-
-            try
-            {
-                return actionWithResult(() =>
-                {
-                    var command = connection.CreateCommand();
-                    command.Transaction = transaction;
-                    return command;
-                });
-            }
-            catch (Exception)
-            {
-                errorOccured = true;
-                throw;
-            }
+            errorOccured = true;
+            throw;
         }
+    }
+
+    public T Execute<T>(Func<Func<IDbCommand>, T> actionWithResult)
+    {
+        if (errorOccured)
+            throw new InvalidOperationException("Error occurred on previous script execution");
+
+        try
+        {
+            return actionWithResult(() =>
+            {
+                var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                return command;
+            });
+        }
+        catch (Exception)
+        {
+            errorOccured = true;
+            throw;
+        }
+    }
 
         public void Initialise(IDbConnection dbConnection, IUpgradeLog upgradeLog, List<SqlScript> executedScripts)
         {
@@ -80,7 +80,6 @@ namespace DbUp.Engine.Transactions
                 executedScriptsCollection.AddRange(executedScriptsListBeforeExecution);
             }
 
-            transaction.Dispose();
-        }
+        transaction.Dispose();
     }
 }

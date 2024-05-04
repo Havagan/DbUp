@@ -57,10 +57,9 @@ namespace DbUp.Tests.Engine.Output
             capturedLogs.Events.ShouldContain(e => e.MessageTemplate.Text == "Executing Database Server script '{0}'");
         }
 
-        class InMemorySink : ILogEventSink
-        {
-            public List<LogEvent> Events { get; } = new List<LogEvent>();
-            public void Emit(LogEvent logEvent) => Events.Add(logEvent);
-        }
+    class InMemorySink : ILogEventSink
+    {
+        public List<LogEvent> Events { get; } = new();
+        public void Emit(LogEvent logEvent) => Events.Add(logEvent);
     }
 }

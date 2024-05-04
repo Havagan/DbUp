@@ -5,6 +5,7 @@
     <Title>DbUp Core library</Title>
     <TargetFrameworks>netstandard2.0;net462;net6.0</TargetFrameworks>
     <RootNamespace>DbUp</RootNamespace>
+    <PackageId>dbup-core</PackageId>
     <AssemblyOriginatorKeyFile>../dbup.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
@@ -15,12 +16,12 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0"/>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
-    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.CSharp"/>
   </ItemGroup>
 
   <ItemGroup>
